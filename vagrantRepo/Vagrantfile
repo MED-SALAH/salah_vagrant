@@ -1,0 +1,140 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # p1jenkins server
+  config.vm.define "p1jenkins" do |p1jenkins|
+    p1jenkins.vm.box = "centos/7"
+    p1jenkins.vm.hostname = "p1jenkins"
+    p1jenkins.vm.box_url = "centos/7"
+    p1jenkins.vm.network :private_network, ip: "192.168.1.20"
+    p1jenkins.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 4072]
+      v.customize ["modifyvm", :id, "--name", "p1jenkins"]
+      v.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+    SHELL
+    p1jenkins.vm.provision "shell", path: "install_p1jenkins.sh"
+  end
+
+  # Dev server
+  config.vm.define "servdev" do |servdev|
+    servdev.vm.box = "centos/7"
+    servdev.vm.hostname = "servdev"
+    servdev.vm.box_url = "centos/7"
+    servdev.vm.network :private_network, ip: "192.168.1.22"
+    servdev.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "servdev"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+  end
+
+  # Qualif server
+  config.vm.define "servqualif" do |servqualif|
+    servqualif.vm.box = "centos/7"
+    servqualif.vm.hostname = "servqualif"
+    servqualif.vm.box_url = "centos/7"
+    servqualif.vm.network :private_network, ip: "192.168.1.23"
+    servqualif.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "servqualif"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+  end
+
+  # Prod server
+  config.vm.define "serprod" do |serprod|
+    serprod.vm.box = "centos/7"
+    serprod.vm.hostname = "serprod"
+    serprod.vm.box_url = "centos/7"
+    serprod.vm.network :private_network, ip: "192.168.1.24"
+    serprod.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "serprod"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+  end
+
+  # Bdd server
+  config.vm.define "servbdd" do |servbdd|
+    servbdd.vm.box = "centos/7"
+    servbdd.vm.hostname = "servbdd"
+    servbdd.vm.box_url = "centos/7"
+    servbdd.vm.network :private_network, ip: "192.168.1.25"
+    servbdd.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "servbdd"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+    servbdd.vm.provision "shell", path: "install_servpostgres.sh"
+  end
+
+  # Registry server
+  config.vm.define "servregistry" do |servregistry|
+    servregistry.vm.box = "centos/7"
+    servregistry.vm.hostname = "servregistry"
+    servregistry.vm.box_url = "centos/7"
+    servregistry.vm.network :private_network, ip: "192.168.1.5"
+    servregistry.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "servregistry"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+    servregistry.vm.provision "shell", path: "install_registry.sh"
+  end
+
+  # Gitlab server
+  config.vm.define "servgitlab" do |servgitlab|
+    servgitlab.vm.box = "centos/7"
+    servgitlab.vm.hostname = "servgitlab"
+    servgitlab.vm.box_url = "centos/7"
+    servgitlab.vm.network :private_network, ip: "192.168.1.26"
+    servgitlab.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 2048]
+      v.customize ["modifyvm", :id, "--name", "servgitlab"]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      sudo yum update -y
+      SHELL
+    servgitlab.vm.provision "shell", path: "install_gitlab.sh"
+  end
+end
